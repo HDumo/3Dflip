@@ -1,6 +1,6 @@
 /*
  * Filename:    CoinFlip.java
- * Author:      Eduardo R. Rivas, Bryan J. VerHoven
+ * Author:      Eduardo R. Rivas, Bryan J. VerHoven, KC
  * Class:       CMSC 325
  * Date:        5 Nov 2013
  * Assignment:  Project 1
@@ -21,9 +21,9 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.Spatial;
 import com.jme3.light.DirectionalLight;
+import com.jme3.math.FastMath;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import de.lessvoid.nifty.Nifty;
-//import de.lessvoid.nifty.elements.Element;
 import de.lessvoid.nifty.elements.render.TextRenderer;
 
 public class CoinFlip3D extends SimpleApplication {
@@ -34,6 +34,22 @@ public class CoinFlip3D extends SimpleApplication {
     private RigidBodyControl coinPhysics;
     private RigidBodyControl tablePhysics;
     Spatial coin;
+    public Boolean isHeads;
+        
+    // flipRoundState tracks where a coin is at in
+    // its sacred journey to becoming a statistic.
+    // null = not initialized yet
+    // ready = all dependancies and visual updates complete
+    // flipstart = its up in the air
+    // fliplanded = table collision
+    // resolved = updates complete
+    // error = coin fell off the table
+    private enum flipRoundState {NULL, READY, FLIPSTART, FLIPLANDED, RESOLVED, ERROR};
+    private flipRoundState flipState;
+    private Integer count = 0;
+    
+    private String display_flipState;
+    
     private static Box table;
     Nifty nifty;
     public int score = 0;
@@ -75,6 +91,9 @@ public class CoinFlip3D extends SimpleApplication {
         inputManager.deleteMapping(INPUT_MAPPING_EXIT);
         inputManager.addMapping("Escape", new KeyTrigger(KeyInput.KEY_ESCAPE));
         inputManager.addListener(actionListener, "Escape");
+        
+        //initialize the coin flip state 
+        flipState = flipRoundState.NULL;
         
         // initialize materials, table
         initCoin();
@@ -119,8 +138,16 @@ public class CoinFlip3D extends SimpleApplication {
         // load the coin
         coin = assetManager.loadModel("Models/penny/penny.j3o");
         
+        // make the coin physical with a mass > 0.0f
+        coinPhysics = new RigidBodyControl(2.0f);
+        
+        // add physical coin to physics space
+        coin.addControl(coinPhysics);
+        
         // display coin
         rootNode.attachChild(coin);
+        
+        bulletAppState.getPhysicsSpace().add(coinPhysics);
     }
     
     // Floor
@@ -140,31 +167,100 @@ public class CoinFlip3D extends SimpleApplication {
     }
     
     public void flipCoin(){
-        // make the coin physical with a mass > 0.0f
-        coinPhysics = new RigidBodyControl(2.0f);
         
-        // add physical coin to physics space
-        coin.addControl(coinPhysics);
-        bulletAppState.getPhysicsSpace().add(coinPhysics);
-        coinPhysics.applyTorque(new Vector3f(10.0f,  0.0f, 0.0f));
-        coinPhysics.setLinearVelocity(Vector3f.UNIT_Y.mult(6));
-        //if heads
-        score += 10;
-        //else
-        score -= 5;
-        // update Score in GUI
-        nifty.getCurrentScreen().findElementByName("score").getRenderer(TextRenderer.class).setText("Score: " + score);
-        nifty.getCurrentScreen().findElementByName("playerName").getRenderer(TextRenderer.class).setText(displayPlayerName);
+        // only allow a flip if we are ready for another 
+        if (flipState == flipRoundState.READY) {
+            
+            coinPhysics.applyTorque(new Vector3f(10.0f,  0.0f, 0.0f));
+            coinPhysics.setLinearVelocity(Vector3f.UNIT_Y.mult(6));
         
+            // initiate new flip with this state
+            flipState = flipRoundState.FLIPSTART;
+        } 
     }
     
     // update loop
     @Override
     public void simpleUpdate(float tpf) {
        if (isRunning) {
-         // update Score in GUI
+
+           
+        switch (flipState) {
+            
+            case NULL:
+                display_flipState = "here is a coin..";
+                flipState = flipRoundState.READY; 
+            break;
+
+            case READY:
+                display_flipState = "Press space to play";
+            break;
+
+            case FLIPSTART:
+                
+                // make sure that the coin was flipped up in the air and 
+                // has come back down to table
+                if (coin.getLocalTranslation().getY() < 1 & count > 200)
+                {
+                    count = 0;
+                    flipState = flipRoundState.FLIPLANDED;
+                } else {
+                    display_flipState = "waiting for coin" ;
+                    count++;
+                }
+                break;
+
+            case FLIPLANDED:
+                // This is to catch an edge case where the coin in rolling around
+                
+               Boolean isHeadsState = isHeads;
+               display_flipState = "watching ...";
+               
+               // dont move on until the side showing is stable
+               if (isHeads == isHeadsState) {count ++; } else { count =0;} 
+                
+               if (count > 500) {
+                flipState = flipRoundState.RESOLVED;
+                count = 0;
+               }
+            break;
+
+            case RESOLVED:
+                
+                // Show message for 250
+                if (isHeads) {
+                    display_flipState = "Heads, you win (+10)";
+                } else {
+                    display_flipState = "Tails, you loose (-5)";
+                }
+                count++;
+                
+                if (count > 250) {
+                score += (isHeads) ? 10 : -5;
+                flipState = flipRoundState.READY;
+                count = 0;
+                }
+                break;
+
+            case ERROR:
+                display_flipState = "you lost your penny .. you loose!";
+            break;
+
+            default:
+            break;
+        } 
+         
+        // update Score in GUI
          nifty.getCurrentScreen().findElementByName("score").getRenderer(TextRenderer.class).setText("Score: " + score);
-         nifty.getCurrentScreen().findElementByName("playerName").getRenderer(TextRenderer.class).setText(displayPlayerName);
+         nifty.getCurrentScreen().findElementByName("playerName").getRenderer(TextRenderer.class).setText(displayPlayerName + " (" +display_flipState+" )");
+        
+        // Get the coins rotation of in relation to vector and convert to degrees
+        // Essentially yRot will always be @180 if tails
+        float yRot = coin.getWorldRotation().toAngleAxis(new Vector3f(1, 0, 0)) * FastMath.RAD_TO_DEG;
+        isHeads = (yRot < 170 || yRot > 190);
+        
+        // update face in GUI
+        //nifty.getCurrentScreen().findElementByName("face").getRenderer(TextRenderer.class).setText("Heads: " + isHeads + " : " + Math.round(yRot) );
        }
     }
    

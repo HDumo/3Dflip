@@ -1,6 +1,6 @@
 /*
  * Filename:    MyStartScreen.java
- * Author:      Eduardo R. Rivas, Bryan J. VerHoven
+ * Author:      Eduardo R. Rivas, Bryan J. VerHoven, KC
  * Class:       CMSC 325
  * Date:        5 Nov 2013
  * Assignment:  Project 1
@@ -9,8 +9,6 @@
 package cmsc325.project1;
  
 import com.jme3.app.Application;
-import com.jme3.app.FlyCamAppState;
-import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import de.lessvoid.nifty.Nifty;
