@@ -11,6 +11,7 @@ package cmsc325.project1;
 import com.jme3.app.Application;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
+import com.jme3.system.AppSettings;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.screen.Screen;
 import de.lessvoid.nifty.screen.ScreenController;
@@ -20,7 +21,7 @@ public class MyStartScreen extends AbstractAppState implements ScreenController 
     Nifty nifty;
     private Screen screen;
     private CoinFlip3D app;
- 
+        
     public MyStartScreen() {
     }
  
@@ -40,6 +41,7 @@ public class MyStartScreen extends AbstractAppState implements ScreenController 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
+        
         this.app = (CoinFlip3D) app;
     }
  

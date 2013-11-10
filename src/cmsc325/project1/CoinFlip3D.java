@@ -23,11 +23,13 @@ import com.jme3.scene.Spatial;
 import com.jme3.light.DirectionalLight;
 import com.jme3.math.FastMath;
 import com.jme3.niftygui.NiftyJmeDisplay;
+import com.jme3.system.AppSettings;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.elements.render.TextRenderer;
 
 public class CoinFlip3D extends SimpleApplication {
     
+    public static boolean isDebug = false;
     //Declare variables
     private BulletAppState bulletAppState;
     Material tableMaterial;
@@ -58,6 +60,17 @@ public class CoinFlip3D extends SimpleApplication {
     
     public static void main(String[] args){
         CoinFlip3D coinFlip = new CoinFlip3D();
+        
+        // Setup the launch screen
+        AppSettings flip3d = new AppSettings(true);
+            flip3d.setResolution(640,480);
+            flip3d.setSettingsDialogImage("Interface/Images/Coin.jpg");
+            flip3d.setTitle("Flip3D - Team Asteroids"); 
+        
+            coinFlip.setSettings(flip3d);
+            coinFlip.setDisplayFps(isDebug);
+            coinFlip.setDisplayStatView(isDebug); 
+            
         coinFlip.start();
     }
     
