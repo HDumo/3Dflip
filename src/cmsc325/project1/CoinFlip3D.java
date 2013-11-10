@@ -231,7 +231,7 @@ public class CoinFlip3D extends SimpleApplication {
                 if (isHeads) {
                     display_flipState = "Heads, you win (+10)";
                 } else {
-                    display_flipState = "Tails, you loose (-5)";
+                    display_flipState = "Tails, you lose (-5)";
                 }
                 count++;
                 
@@ -243,7 +243,7 @@ public class CoinFlip3D extends SimpleApplication {
                 break;
 
             case ERROR:
-                display_flipState = "you lost your penny .. you loose!";
+                display_flipState = "you lost your penny .. you lose!";
             break;
 
             default:
