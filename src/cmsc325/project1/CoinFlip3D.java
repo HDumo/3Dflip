@@ -171,8 +171,8 @@ public class CoinFlip3D extends SimpleApplication {
         // only allow a flip if we are ready for another 
         if (flipState == flipRoundState.READY) {
             
-            coinPhysics.applyTorque(new Vector3f(10.0f,  0.0f, 0.0f));
             coinPhysics.setLinearVelocity(Vector3f.UNIT_Y.mult(6));
+            coinPhysics.setAngularVelocity(new Vector3f(45.0f, 0.0f, 0.0f));
         
             // initiate new flip with this state
             flipState = flipRoundState.FLIPSTART;
