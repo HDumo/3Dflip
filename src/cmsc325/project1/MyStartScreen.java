@@ -48,36 +48,38 @@ public class MyStartScreen extends AbstractAppState implements ScreenController 
     //public void update(float tpf) {
     //}
  
+    // Launch game after clicking on start button
     public void startGame(String nextScreen) {
         nifty.gotoScreen(nextScreen);
         app.LoadMainGame();
         app.isRunning = true;
     }
     
+    // Update player name when player button is clicked
     public void playerName(String nameOfPlayer) {
         app.displayPlayerName = nameOfPlayer;
         app.money = 1000;
     }
     
+    // Resume game when player clicks on Resume
     public void resumeGame(String nextScreen) {
         nifty.gotoScreen(nextScreen);
         app.isRunning = true;
     }
     
-    //Set bid amount based on value entered by player in text field
+    // Set bid amount based on value entered by player in text field
     public void setBidAmount() {
         Screen currentScreen = nifty.getCurrentScreen();
         TextField bidAmount = currentScreen.findNiftyControl("bidAmount",TextField.class);
         app.amountOfBid = Integer.parseInt(bidAmount.getText());
     }
     
-    //Set bid to Heads or Tails based on button that player clicks
+    // Set bid to Heads or Tails based on button that player clicks
     public void setBid(String bidType) {
         app.bid = bidType;
-        System.out.println(bidType);
-        System.out.println(app.bid);
     }
  
+    // Quit game if player clicks on Quit
     public void quitGame() {
         app.stop();
     }
