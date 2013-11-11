@@ -214,6 +214,7 @@ public class CoinFlip3D extends SimpleApplication {
             
             case BROKE:
                 display_flipState = "You are out of money! ";
+                if (money > 0) flipState = flipRoundState.READY;
             break;
                 
             case NULL:
