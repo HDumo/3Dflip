@@ -21,6 +21,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.Spatial;
 import com.jme3.light.DirectionalLight;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.system.AppSettings;
@@ -31,6 +32,8 @@ import de.lessvoid.nifty.elements.render.TextRenderer;
 public class CoinFlip3D extends SimpleApplication {
     
     public static boolean isDebug = false;
+    public static boolean colorCoinState = true;
+    
     //Declare variables
     private BulletAppState bulletAppState;
     Material tableMaterial;
@@ -63,6 +66,7 @@ public class CoinFlip3D extends SimpleApplication {
     public int money = 1000;
     public String displayPlayerName = "Player 1";
     public boolean isRunning = false;
+    public DirectionalLight light;
     
     public static void main(String[] args){
         CoinFlip3D coinFlip = new CoinFlip3D();
@@ -151,7 +155,7 @@ public class CoinFlip3D extends SimpleApplication {
     // light
     public void initLight(){
         // add a light
-        DirectionalLight light = new DirectionalLight();
+        light = new DirectionalLight();
         light.setDirection(new Vector3f(-0.1f, -0.7f, -1.0f));
         
         // display light
@@ -166,8 +170,11 @@ public class CoinFlip3D extends SimpleApplication {
         // make the coin physical with a mass > 0.0f
         coinPhysics = new RigidBodyControl(2.0f);
         
+        
         // add physical coin to physics space
         coin.addControl(coinPhysics);
+        coinPhysics.setFriction(5f);
+        coinPhysics.setDamping(.1f, .1f);
         
         // display coin
         rootNode.attachChild(coin);
@@ -204,11 +211,34 @@ public class CoinFlip3D extends SimpleApplication {
         } 
     }
     
+
+    // Get coin average movement over a number of samples
+    // this function could effect performance if program grows
+    // Solution might be to allow a non-blocking calculation
+    // for this... keep it on the radar
+    public Boolean getAverageMovement(int samples){
+    
+    float tolerance = .1f;   
+    int i = 0;
+    float movement = 0;
+    
+    while (i < samples) {    
+        movement  = coinPhysics.getAngularVelocity().x *100 
+                    + coinPhysics.getAngularVelocity().y *100
+                    + coinPhysics.getAngularVelocity().z *100;
+        movement += movement;
+        i++;
+    }
+    
+    // 0 is perfectly 
+    // I added tolerance because.. well. sucks without it.
+    return ( movement/samples< 0+tolerance && movement/samples> 0-tolerance) ? true : false;       
+    }
+    
     // update loop
     @Override
     public void simpleUpdate(float tpf) {
        if (isRunning) {
-
            
         switch (flipState) {
             
@@ -224,10 +254,12 @@ public class CoinFlip3D extends SimpleApplication {
 
             case READY:
                 display_flipState = "Press space to play";
+                if (colorCoinState) light.setColor(ColorRGBA.Green);
             break;
 
             case FLIPSTART:
-                
+               
+                if (colorCoinState) light.setColor(ColorRGBA.Yellow);
                 // make sure that the coin was flipped up in the air and 
                 // has come back down to table
                 if (coin.getLocalTranslation().getY() < 1 && count > 250)
@@ -242,14 +274,16 @@ public class CoinFlip3D extends SimpleApplication {
 
             case FLIPLANDED:
                 // This is to catch an edge case where the coin in rolling around
-                
+               if (colorCoinState) light.setColor(ColorRGBA.Cyan); 
                Boolean isHeadsState = isHeads;
-               display_flipState = "watching ...";
+               display_flipState = "watching ..." ;
                
                // dont move on until the side showing is stable
                if (isHeads == isHeadsState) {count ++; } else { count =0;} 
                 
-               if (count > 550) {
+               if (count > 550 && getAverageMovement(10)) {
+                   coinPhysics.clearForces();
+                if (colorCoinState) light.setColor(ColorRGBA.Red);   
                 flipState = flipRoundState.RESOLVED;
                 count = 0;
                }
@@ -285,6 +319,7 @@ public class CoinFlip3D extends SimpleApplication {
                   if (money <= 0) {
                       money = 0;
                       flipState = flipRoundState.BROKE;
+                      if (colorCoinState) light.setColor(ColorRGBA.Black); 
                   } else {
                       flipState = flipRoundState.READY;
                       count = 0;
