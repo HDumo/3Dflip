@@ -59,6 +59,7 @@ public class MyStartScreen extends AbstractAppState implements ScreenController 
     public void playerName(String nameOfPlayer) {
         app.displayPlayerName = nameOfPlayer;
         app.money = 1000;
+        app.luckyCharm = 0.0;
     }
     
     // Resume game when player clicks on Resume
@@ -67,20 +68,38 @@ public class MyStartScreen extends AbstractAppState implements ScreenController 
         app.isRunning = true;
     }
     
-    // Set bid amount based on value entered by player in text field
-    public void setBidAmount() {
+    // Set bet amount based on value entered by player in text field
+    public void setBetAmount() {
         Screen currentScreen = nifty.getCurrentScreen();
-        TextField bidAmount = currentScreen.findNiftyControl("bidAmount",TextField.class);
-        app.amountOfBid = Integer.parseInt(bidAmount.getText());
+        TextField betAmount = currentScreen.findNiftyControl("betAmount",TextField.class);
+        app.amountOfBet = Integer.parseInt(betAmount.getText());
     }
     
-    // Set bid to Heads or Tails based on button that player clicks
-    public void setBid(String bidType) {
-        app.bid = bidType;
+    // Set bet to Heads or Tails based on button that player clicks
+    public void setBet(String betType) {
+        app.bet = betType;
     }
  
     // Quit game if player clicks on Quit
     public void quitGame() {
         app.stop();
+    }
+    
+    // Change screen when player clicks on shop
+    public void enterShop(String nextScreen) {
+        nifty.gotoScreen(nextScreen);
+    }
+    
+    // Change screen when player clicks on exit shop
+    public void exitShop(String nextScreen) {
+        nifty.gotoScreen(nextScreen);
+    }
+    
+    // Buy lucky charm!
+    public void purchaseLuckyCharm() {
+        if (app.money > 1000) {
+          app.luckyCharm += 1.0;
+          app.money -= 1000;
+        }
     }
 }
