@@ -74,7 +74,7 @@ public class CoinFlip3D extends SimpleApplication {
         // Setup the launch screen
         AppSettings flip3d = new AppSettings(true);
         flip3d.setResolution(1360,768);
-        flip3d.setSettingsDialogImage("Interface/Images/Coin.jpg");
+        flip3d.setSettingsDialogImage("Interface/Images/splash.png");
         flip3d.setTitle("Flip3D - Team Asteroids");
         
         coinFlip.setSettings(flip3d);

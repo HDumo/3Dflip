@@ -14,7 +14,26 @@
   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
   <screen id="start" controller="cmsc325.project1.MyStartScreen">
     <layer id="background" childLayout="center">
-      <image filename="Interface/Images/Coin.jpg" height="50%" width="50%"></image>
+      <!-- <image filename="Interface/Images/Coin.jpg" height="50%" width="50%"></image> -->
+      <panel id="text1" height="25%" width="400px" align="center" childLayout="center">
+      <text wrap="true" text="
+
+Did you know you have the mental capability to determine &#10;
+if a coin will land on heads or tails right?&#10;
+&#10;
+In this game you get to put that to the test (and discover how to effect the Flip results!)!!&#10;
+&#10;
+Click start below to begin.&#10;
+&#10;
+You start off with $1000 and should begin by placing your bet amount.&#10;
+&#10;
+You can always press escape to get back to help or get to the store where you can purchase lucky charms and more!&#10;
+&#10;&#10;&#10;&#10;&#10;&#10;                                                                
+
+
+
+" font="Interface/Fonts/Default.fnt" width="100%" height="100%" />
+      </panel>
     </layer>
     <layer id="foreground" childLayout="vertical">
       <panel id="panel_top" height="25%" width="75%" align="center" childLayout="center"> 
