@@ -51,7 +51,8 @@ public class CoinFlip3D extends SimpleApplication {
     // fliplanded = table collision
     // resolved = updates complete
     // error = coin fell off the table
-    private enum flipRoundState {NULL, READY, FLIPSTART, FLIPLANDED, RESOLVED, ERROR};
+    // broke = no money
+    private enum flipRoundState {NULL, READY, FLIPSTART, FLIPLANDED, RESOLVED, ERROR, BROKE};
     private flipRoundState flipState;
     private Integer count = 0;
     
@@ -211,6 +212,10 @@ public class CoinFlip3D extends SimpleApplication {
            
         switch (flipState) {
             
+            case BROKE:
+                display_flipState = "You are out of money! ";
+            break;
+                
             case NULL:
                 display_flipState = "here is a coin..";
                 flipState = flipRoundState.READY; 
@@ -274,8 +279,16 @@ public class CoinFlip3D extends SimpleApplication {
                   } else {
                       money -= amountOfBet;
                   }
-                  flipState = flipRoundState.READY;
-                  count = 0;
+                  
+                  // If you run out of money then don't continue
+                  if (money <= 0) {
+                      money = 0;
+                      flipState = flipRoundState.BROKE;
+                  } else {
+                      flipState = flipRoundState.READY;
+                      count = 0;
+                  }
+
                 }
                 break;
 
