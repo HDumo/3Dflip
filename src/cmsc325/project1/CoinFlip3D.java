@@ -59,7 +59,7 @@ public class CoinFlip3D extends SimpleApplication {
     
     private static Box table;
     Nifty nifty;
-    public int money = 10000;
+    public int money = 1000;
     public String displayPlayerName = "Player 1";
     public boolean isRunning = false;
     
