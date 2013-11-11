@@ -25,6 +25,7 @@ import com.jme3.math.FastMath;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.system.AppSettings;
 import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.controls.TextField;
 import de.lessvoid.nifty.elements.render.TextRenderer;
 
 public class CoinFlip3D extends SimpleApplication {
@@ -36,7 +37,10 @@ public class CoinFlip3D extends SimpleApplication {
     private RigidBodyControl coinPhysics;
     private RigidBodyControl tablePhysics;
     Spatial coin;
-    public Boolean isHeads;
+    boolean guessedCorrectly = false;
+    public boolean isHeads;
+    public int amountOfBid = 200;
+    public String bid = "Heads";
         
     // flipRoundState tracks where a coin is at in
     // its sacred journey to becoming a statistic.
@@ -54,7 +58,7 @@ public class CoinFlip3D extends SimpleApplication {
     
     private static Box table;
     Nifty nifty;
-    public int score = 0;
+    public int money = 1000;
     public String displayPlayerName = "Player 1";
     public boolean isRunning = false;
     
@@ -63,13 +67,13 @@ public class CoinFlip3D extends SimpleApplication {
         
         // Setup the launch screen
         AppSettings flip3d = new AppSettings(true);
-            flip3d.setResolution(640,480);
-            flip3d.setSettingsDialogImage("Interface/Images/Coin.jpg");
-            flip3d.setTitle("Flip3D - Team Asteroids"); 
+        flip3d.setResolution(640,480);
+        flip3d.setSettingsDialogImage("Interface/Images/Coin.jpg");
+        flip3d.setTitle("Flip3D - Team Asteroids");
         
-            coinFlip.setSettings(flip3d);
-            coinFlip.setDisplayFps(isDebug);
-            coinFlip.setDisplayStatView(isDebug); 
+        coinFlip.setSettings(flip3d);
+        coinFlip.setDisplayFps(isDebug);
+        coinFlip.setDisplayStatView(isDebug);
             
         coinFlip.start();
     }
@@ -241,17 +245,25 @@ public class CoinFlip3D extends SimpleApplication {
             case RESOLVED:
                 
                 // Show message for 250
-                if (isHeads) {
-                    display_flipState = "Heads, you win (+10)";
-                } else {
-                    display_flipState = "Tails, you lose (-5)";
+                // If they guessed correctly...
+                if (((isHeads) && bid.equals("Heads")) || ((!isHeads) && bid.equals("Tails"))) {
+                    display_flipState = "Great job! You won $" + amountOfBid;
+                    guessedCorrectly = true;
+                // If they guessed incorrectly
+                } else if (((isHeads) && bid.equals("Tails")) || ((!isHeads) && bid.equals("Heads"))) {
+                    display_flipState = "Sorry! You lost $" + amountOfBid;
+                    guessedCorrectly = false;
                 }
                 count++;
                 
                 if (count > 250) {
-                score += (isHeads) ? 10 : -5;
-                flipState = flipRoundState.READY;
-                count = 0;
+                  if (guessedCorrectly) {
+                    money += amountOfBid;
+                  } else {
+                      money -= amountOfBid;
+                  }
+                  flipState = flipRoundState.READY;
+                  count = 0;
                 }
                 break;
 
@@ -263,8 +275,8 @@ public class CoinFlip3D extends SimpleApplication {
             break;
         } 
          
-        // update Score in GUI
-         nifty.getCurrentScreen().findElementByName("score").getRenderer(TextRenderer.class).setText("Score: " + score);
+        // update money and player name
+         nifty.getCurrentScreen().findElementByName("money").getRenderer(TextRenderer.class).setText("Money: $" + money);
          nifty.getCurrentScreen().findElementByName("playerName").getRenderer(TextRenderer.class).setText(displayPlayerName + " (" +display_flipState+" )");
         
         // Get the coins rotation of in relation to vector and convert to degrees
