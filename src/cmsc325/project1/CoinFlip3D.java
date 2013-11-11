@@ -39,8 +39,8 @@ public class CoinFlip3D extends SimpleApplication {
     Spatial coin;
     boolean guessedCorrectly = false;
     public boolean isHeads;
-    public int amountOfBid = 200;
-    public String bid = "Heads";
+    public int amountOfBid;
+    public String bid = "None";
         
     // flipRoundState tracks where a coin is at in
     // its sacred journey to becoming a statistic.
@@ -97,6 +97,9 @@ public class CoinFlip3D extends SimpleApplication {
        // Setup Physics 
         bulletAppState = new BulletAppState();
         stateManager.attach(bulletAppState);
+        
+        MyStartScreen screenControl3 = (MyStartScreen) nifty.getScreen("hud").getScreenController();
+        stateManager.attach(screenControl3);
         
         // configure the camera to look at scene
         cam.setLocation(new Vector3f(0, 4.0f, 6.0f));
@@ -217,7 +220,7 @@ public class CoinFlip3D extends SimpleApplication {
                 
                 // make sure that the coin was flipped up in the air and 
                 // has come back down to table
-                if (coin.getLocalTranslation().getY() < 1 & count > 200)
+                if (coin.getLocalTranslation().getY() < 1 && count > 250)
                 {
                     count = 0;
                     flipState = flipRoundState.FLIPLANDED;
@@ -236,7 +239,7 @@ public class CoinFlip3D extends SimpleApplication {
                // dont move on until the side showing is stable
                if (isHeads == isHeadsState) {count ++; } else { count =0;} 
                 
-               if (count > 500) {
+               if (count > 550) {
                 flipState = flipRoundState.RESOLVED;
                 count = 0;
                }
@@ -245,13 +248,18 @@ public class CoinFlip3D extends SimpleApplication {
             case RESOLVED:
                 
                 // Show message for 250
-                // If they guessed correctly...
-                if (((isHeads) && bid.equals("Heads")) || ((!isHeads) && bid.equals("Tails"))) {
-                    display_flipState = "Great job! You won $" + amountOfBid;
+                // Compare result to player's guess
+                if ((isHeads) && bid.equals("Heads")) {
+                    display_flipState = "Guess: Heads Result: Heads Great job! You won $" + amountOfBid;
                     guessedCorrectly = true;
-                // If they guessed incorrectly
-                } else if (((isHeads) && bid.equals("Tails")) || ((!isHeads) && bid.equals("Heads"))) {
-                    display_flipState = "Sorry! You lost $" + amountOfBid;
+                } else if ((isHeads) && bid.equals("Tails")) {
+                    display_flipState = "Guess: Tails Result: Heads Sorry! You lost $" + amountOfBid;
+                    guessedCorrectly = false;
+                } else if ((!isHeads) && bid.equals("Tails")) {
+                    display_flipState = "Guess: Tails Result: Tails Great job! You won $" + amountOfBid;
+                    guessedCorrectly = true;
+                } else if ((!isHeads) && bid.equals("Heads")) {
+                    display_flipState = "Guess: Heads Result: Tails Sorry! You lost $" + amountOfBid;
                     guessedCorrectly = false;
                 }
                 count++;
@@ -282,7 +290,7 @@ public class CoinFlip3D extends SimpleApplication {
         // Get the coins rotation of in relation to vector and convert to degrees
         // Essentially yRot will always be @180 if tails
         float yRot = coin.getWorldRotation().toAngleAxis(new Vector3f(1, 0, 0)) * FastMath.RAD_TO_DEG;
-        isHeads = (yRot < 170 || yRot > 190);
+        isHeads = (yRot < 160 || yRot > 200);
         
         // update face in GUI
         //nifty.getCurrentScreen().findElementByName("face").getRenderer(TextRenderer.class).setText("Heads: " + isHeads + " : " + Math.round(yRot) );
