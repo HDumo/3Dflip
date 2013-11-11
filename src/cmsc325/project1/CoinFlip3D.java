@@ -45,6 +45,10 @@ public class CoinFlip3D extends SimpleApplication {
     public int amountOfBet;
     public double luckyCharm = 0.0;
     public String bet = "None";
+    
+    // Audio objects declarations
+    private AudioNode natureAudio;
+    private AudioNode coinFlipAudio;
         
     // flipRoundState tracks where a coin is at in
     // its sacred journey to becoming a statistic.
@@ -129,6 +133,7 @@ public class CoinFlip3D extends SimpleApplication {
         initTableMaterial();      
         initLight();
         initTable();
+        initAudio();
     }
     
     //action listener
@@ -208,9 +213,31 @@ public class CoinFlip3D extends SimpleApplication {
         
             // initiate new flip with this state
             flipState = flipRoundState.FLIPSTART;
-        } 
+        }
+        
+        // play sound when the coin flips
+        coinFlipAudio.playInstance();
     }
     
+    public void initAudio(){
+        // coint toss audio will be triggered when the user presses the spacebar to flip coin
+        coinFlipAudio = new AudioNode(assetManager, "Sounds/Effects/coinToss.wav", false);
+        coinFlipAudio.setPositional(false);
+        coinFlipAudio.setLooping(false);
+        coinFlipAudio.setVolume(2);
+        rootNode.attachChild(coinFlipAudio);
+        
+        // outdoor ambient sound that plays in a loop
+        natureAudio = new AudioNode(assetManager, "Sounds/Environment/outdoors.ogg", false);
+        natureAudio.setPositional(false);
+        natureAudio.setLooping(true);
+        natureAudio.setVolume(3);
+        rootNode.attachChild(natureAudio);      
+    }
+    
+    public void stopAmbientAudio(){
+        natureAudio.stop();
+    }
 
     // Get coin average movement over a number of samples
     // this function could effect performance if program grows
@@ -239,6 +266,8 @@ public class CoinFlip3D extends SimpleApplication {
     @Override
     public void simpleUpdate(float tpf) {
        if (isRunning) {
+           // play the ambient sound continuously
+           natureAudio.play();
            
         switch (flipState) {
             
