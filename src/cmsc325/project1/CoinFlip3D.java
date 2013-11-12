@@ -235,6 +235,7 @@ public class CoinFlip3D extends SimpleApplication {
         rootNode.attachChild(natureAudio);      
     }
     
+    // function to stop the ambient sound
     public void stopAmbientAudio(){
         natureAudio.stop();
     }
