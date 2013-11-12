@@ -33,11 +33,24 @@ import com.jme3.light.SpotLight;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.elements.render.TextRenderer;
 
+import com.jme3.texture.Texture;
+import com.jme3.util.SkyFactory;
+
 
 public class CoinFlip3D extends SimpleApplication {
     
     public static boolean isDebug = false;
     public boolean colorCoinState = false;
+    private static float colorMult = 8f;
+    
+    Texture west;
+    Texture east;
+    Texture north;
+    Texture south;
+    Texture up;
+    Texture down;
+    Spatial sky;
+
     
     //Declare variables
     private BulletAppState bulletAppState;
@@ -150,6 +163,7 @@ public class CoinFlip3D extends SimpleApplication {
         initLight();
         initTable();
         initAudio();
+        initSky();
     }
     
     //action listener
@@ -192,6 +206,18 @@ public class CoinFlip3D extends SimpleApplication {
         light.setDirection(cam.getDirection());            
 
         rootNode.addLight(light);
+    }
+    
+    public void initSky(){
+        west = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_west.jpg");
+        east = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_east.jpg");
+        north = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_north.jpg");
+        south = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_south.jpg");
+        up = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_up.jpg");
+        down = assetManager.loadTexture("Textures/Sky/Lagoon/lagoon_down.jpg");
+        
+        sky = SkyFactory.createSky(assetManager, west, east, north, south, up, down, Vector3f.UNIT_XYZ);
+        rootNode.attachChild(sky);
     }
     
     // coin

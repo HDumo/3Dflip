@@ -118,7 +118,9 @@ You can always press escape to get back to help or get to the store where you ca
   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
   <screen id="pause" controller="cmsc325.project1.MyStartScreen">
     <layer id="background" childLayout="center">
+        <!-- 
       <image filename="Interface/Images/Coin.jpg" height="50%" width="50%"></image>
+        -->
     </layer>
     <layer id="foreground" childLayout="vertical">
       <panel id="panel_top" height="25%" width="75%" align="center" childLayout="center"> 
