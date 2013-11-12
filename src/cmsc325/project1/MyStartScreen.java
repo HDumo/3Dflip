@@ -60,6 +60,9 @@ public class MyStartScreen extends AbstractAppState implements ScreenController 
         app.displayPlayerName = nameOfPlayer;
         app.money = 1000;
         app.luckyCharm = 0.0;
+        app.colorCoinState = false;
+        app.imageName = "table.jpg";
+        app.initTableMaterial();
     }
     
     // Resume game when player clicks on Resume
@@ -73,6 +76,11 @@ public class MyStartScreen extends AbstractAppState implements ScreenController 
         Screen currentScreen = nifty.getCurrentScreen();
         TextField betAmount = currentScreen.findNiftyControl("betAmount",TextField.class);
         app.amountOfBet = Integer.parseInt(betAmount.getText());
+        // check to see if bet amount is higher than what the player has
+        if (app.amountOfBet > app.money) {
+            // if so, set bet amount to max money (to prevent negative)
+            app.amountOfBet = app.money;
+        }
     }
     
     // Set bet to Heads or Tails based on button that player clicks
@@ -98,9 +106,29 @@ public class MyStartScreen extends AbstractAppState implements ScreenController 
     
     // Buy lucky charm!
     public void purchaseLuckyCharm() {
+        // if player has > $1000
         if (app.money > 1000) {
           app.luckyCharm += 1.0;
           app.money -= 1000;
+        }
+    }
+    
+    // Buy table mesh!
+    public void purchaseTableMesh(String imageTitle) {
+        // if player has > $250
+        if (app.money > 250) {
+          app.money -= 250;
+          app.imageName = imageTitle;
+          app.initTableMaterial();
+        }
+    }
+    
+    // Buy rainbow coin!
+    public void purchaseRainbowCoin() {
+        // if player has > $250
+        if (app.money > 250) {
+          app.money -= 250;
+          app.colorCoinState = true;
         }
     }
 }
