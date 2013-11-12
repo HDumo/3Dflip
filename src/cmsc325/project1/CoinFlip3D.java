@@ -341,14 +341,14 @@ public class CoinFlip3D extends SimpleApplication {
             case READY:
                 display_flipState = "Press space to play";
                 if (colorCoinState) {
-                    light.setColor(ColorRGBA.Green);
+                    light.setColor(ColorRGBA.Green.mult(colorMult));
                 }
             break;
 
             case FLIPSTART:
                
                 if (colorCoinState) {
-                    light.setColor(ColorRGBA.Yellow);
+                    light.setColor(ColorRGBA.Yellow.mult(colorMult));
                 }
                 // make sure that the coin was flipped up in the air and 
                 // has come back down to table
@@ -365,7 +365,7 @@ public class CoinFlip3D extends SimpleApplication {
             case FLIPLANDED:
                 // This is to catch an edge case where the coin in rolling around
                if (colorCoinState) {
-                   light.setColor(ColorRGBA.Cyan);
+                   light.setColor(ColorRGBA.Cyan.mult(colorMult));
                } 
                Boolean isHeadsState = isHeads;
                display_flipState = "watching ..." ;
@@ -376,7 +376,7 @@ public class CoinFlip3D extends SimpleApplication {
                if (count > 550 && getAverageMovement(10)) {
                    coinPhysics.clearForces();
                 if (colorCoinState) {
-                    light.setColor(ColorRGBA.Red);
+                    light.setColor(ColorRGBA.Red.mult(colorMult));
                 }   
                 flipState = flipRoundState.RESOLVED;
                 count = 0;
