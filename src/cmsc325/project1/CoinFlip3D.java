@@ -9,6 +9,7 @@
 package cmsc325.project1;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.app.state.AppState;
 import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.control.RigidBodyControl;
@@ -26,9 +27,12 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.system.AppSettings;
+import com.jme3.app.state.AbstractAppState;
+import com.jme3.app.state.AppStateManager;
+import com.jme3.light.SpotLight;
 import de.lessvoid.nifty.Nifty;
-import de.lessvoid.nifty.controls.TextField;
 import de.lessvoid.nifty.elements.render.TextRenderer;
+
 
 public class CoinFlip3D extends SimpleApplication {
     
@@ -73,7 +77,8 @@ public class CoinFlip3D extends SimpleApplication {
     public int money = 1000;
     public String displayPlayerName = "Player 1";
     public boolean isRunning = false;
-    public DirectionalLight light;
+    public SpotLight light;
+    MyStartScreen screenControl;
     
     public static void main(String[] args){
         CoinFlip3D coinFlip = new CoinFlip3D();
@@ -100,22 +105,25 @@ public class CoinFlip3D extends SimpleApplication {
         nifty = display.getNifty();
         nifty.addXml("Interface/xmlNameGoes.xml");
         nifty.gotoScreen("start");
-        MyStartScreen screenControl = (MyStartScreen) nifty.getScreen("start").getScreenController();
-        stateManager.attach(screenControl);
+        screenControl = (MyStartScreen) nifty.getScreen("start").getScreenController();
+        stateManager.attach((AppState) screenControl);
         guiViewPort.addProcessor(display);
         
     }
     
     public void LoadMainGame() {
+        flyCam.setEnabled(true);
+        flyCam.setMoveSpeed(10f);
+        flyCam.setDragToRotate(true);
        // Setup Physics 
         bulletAppState = new BulletAppState();
         stateManager.attach(bulletAppState);
         
         MyStartScreen screenControl3 = (MyStartScreen) nifty.getScreen("hud").getScreenController();
-        stateManager.attach(screenControl3);
+        stateManager.attach((AppState) screenControl3);
         
         MyStartScreen screenControl4 = (MyStartScreen) nifty.getScreen("shop").getScreenController();
-        stateManager.attach(screenControl4);
+        stateManager.attach( (AppState) screenControl4);
         
         // configure the camera to look at scene
         cam.setLocation(new Vector3f(0, 4.0f, 6.0f));
@@ -130,6 +138,11 @@ public class CoinFlip3D extends SimpleApplication {
         
         //initialize the coin flip state 
         flipState = flipRoundState.NULL;
+        
+        Spatial gameLevel = assetManager.loadModel("Scenes/town.j3o");
+        gameLevel.setLocalTranslation(0, -5.2f, -10f);
+        //gameLevel.setLocalScale(2);
+        rootNode.attachChild(gameLevel);
         
         // initialize materials, table
         initCoin();
@@ -146,7 +159,7 @@ public class CoinFlip3D extends SimpleApplication {
           isRunning = false;
           nifty.gotoScreen("pause");
           MyStartScreen screenControl2 = (MyStartScreen) nifty.getScreen("pause").getScreenController();
-          stateManager.attach(screenControl2);
+          stateManager.attach((AppState) screenControl2);
         }
         if (name.equals("Flip the Coin") && !keyPressed) {
           flipCoin();
@@ -162,11 +175,22 @@ public class CoinFlip3D extends SimpleApplication {
     
     // light
     public void initLight(){
-        // add a light
-        light = new DirectionalLight();
-        light.setDirection(new Vector3f(-0.1f, -0.7f, -1.0f));
-        
-        // display light
+        // sun 
+        DirectionalLight sun = new DirectionalLight();
+        sun.setColor(ColorRGBA.White.mult(.7f));
+        sun.setDirection(new Vector3f(-.5f,-.5f,-.5f).normalizeLocal());
+        rootNode.addLight(sun); 
+  
+        // Spotlight basic setup from jMonkey wiki
+        // blew wayyy too much time on trying to get cam.getLocation()/cam.getDirection()
+        // changed to regular Vector3f - grrr - ended up just widening the Outer angle to compensate
+        light = new SpotLight();
+        light.setSpotRange(8f);                           
+        light.setSpotInnerAngle(10f * FastMath.DEG_TO_RAD); 
+        light.setSpotOuterAngle(50f * FastMath.DEG_TO_RAD);         
+        light.setPosition(cam.getLocation());               
+        light.setDirection(cam.getDirection());            
+
         rootNode.addLight(light);
     }
     
@@ -174,6 +198,8 @@ public class CoinFlip3D extends SimpleApplication {
     public void initCoin(){
         // load the coin
         coin = assetManager.loadModel("Models/penny/penny.j3o");
+        
+        coin.setLocalTranslation(0, 5f, 0);
         
         // make the coin physical with a mass > 0.0f
         coinPhysics = new RigidBodyControl(2.0f);
