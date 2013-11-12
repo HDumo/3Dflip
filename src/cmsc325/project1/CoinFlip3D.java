@@ -8,8 +8,8 @@
 
 package cmsc325.project1;
 
-import com.jme3.audio.AudioNode;
 import com.jme3.app.SimpleApplication;
+import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.input.KeyInput;
@@ -33,14 +33,16 @@ import de.lessvoid.nifty.elements.render.TextRenderer;
 public class CoinFlip3D extends SimpleApplication {
     
     public static boolean isDebug = false;
-    public static boolean colorCoinState = true;
+    public boolean colorCoinState = false;
     
     //Declare variables
     private BulletAppState bulletAppState;
     Material tableMaterial;
+    public String imageName = "table.jpg";
     private RigidBodyControl coinPhysics;
     private RigidBodyControl tablePhysics;
     Spatial coin;
+    Geometry tableGeometry;
     boolean guessedCorrectly = false;
     public boolean isHeads;
     public int amountOfBet;
@@ -100,7 +102,7 @@ public class CoinFlip3D extends SimpleApplication {
         nifty.gotoScreen("start");
         MyStartScreen screenControl = (MyStartScreen) nifty.getScreen("start").getScreenController();
         stateManager.attach(screenControl);
-        guiViewPort.addProcessor(display); //add it to your gui-viewport so that the processor will start working
+        guiViewPort.addProcessor(display);
         
     }
     
@@ -155,7 +157,7 @@ public class CoinFlip3D extends SimpleApplication {
     // initialize the materials
     public void initTableMaterial(){
         tableMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        tableMaterial.setTexture("ColorMap", assetManager.loadTexture("Textures/table/table.jpg"));
+        tableMaterial.setTexture("ColorMap", assetManager.loadTexture("Textures/table/" + imageName));
     }
     
     // light
@@ -193,7 +195,7 @@ public class CoinFlip3D extends SimpleApplication {
         table = new Box(5.0f, 0.5f, 5.0f);
         table.scaleTextureCoordinates(new Vector2f(1, 1));
         
-        Geometry tableGeometry = new Geometry("table", table);
+        tableGeometry = new Geometry("table", table);
         tableGeometry.setMaterial(tableMaterial);
         tableGeometry.setLocalTranslation(0.0f, 0.0f, 0.0f);
         this.rootNode.attachChild(tableGeometry);
@@ -214,10 +216,10 @@ public class CoinFlip3D extends SimpleApplication {
         
             // initiate new flip with this state
             flipState = flipRoundState.FLIPSTART;
-        }
-        
-        // play sound when the coin flips
-        coinFlipAudio.playInstance();
+            
+            // play sound when the coin flips
+            coinFlipAudio.playInstance();
+        } 
     }
     
     public void initAudio(){
@@ -240,6 +242,7 @@ public class CoinFlip3D extends SimpleApplication {
     public void stopAmbientAudio(){
         natureAudio.stop();
     }
+    
 
     // Get coin average movement over a number of samples
     // this function could effect performance if program grows
@@ -285,12 +288,16 @@ public class CoinFlip3D extends SimpleApplication {
 
             case READY:
                 display_flipState = "Press space to play";
-                if (colorCoinState) light.setColor(ColorRGBA.Green);
+                if (colorCoinState) {
+                    light.setColor(ColorRGBA.Green);
+                }
             break;
 
             case FLIPSTART:
                
-                if (colorCoinState) light.setColor(ColorRGBA.Yellow);
+                if (colorCoinState) {
+                    light.setColor(ColorRGBA.Yellow);
+                }
                 // make sure that the coin was flipped up in the air and 
                 // has come back down to table
                 if (coin.getLocalTranslation().getY() < 1 && count > 250)
@@ -305,7 +312,9 @@ public class CoinFlip3D extends SimpleApplication {
 
             case FLIPLANDED:
                 // This is to catch an edge case where the coin in rolling around
-               if (colorCoinState) light.setColor(ColorRGBA.Cyan); 
+               if (colorCoinState) {
+                   light.setColor(ColorRGBA.Cyan);
+               } 
                Boolean isHeadsState = isHeads;
                display_flipState = "watching ..." ;
                
@@ -314,7 +323,9 @@ public class CoinFlip3D extends SimpleApplication {
                 
                if (count > 550 && getAverageMovement(10)) {
                    coinPhysics.clearForces();
-                if (colorCoinState) light.setColor(ColorRGBA.Red);   
+                if (colorCoinState) {
+                    light.setColor(ColorRGBA.Red);
+                }   
                 flipState = flipRoundState.RESOLVED;
                 count = 0;
                }
@@ -371,6 +382,7 @@ public class CoinFlip3D extends SimpleApplication {
          nifty.getCurrentScreen().findElementByName("money").getRenderer(TextRenderer.class).setText("Money: $" + money);
          nifty.getCurrentScreen().findElementByName("playerName").getRenderer(TextRenderer.class).setText(displayPlayerName + " (" +display_flipState+" )");
          nifty.getCurrentScreen().findElementByName("luckyCharm").getRenderer(TextRenderer.class).setText("LuckyCharm: " + luckyCharm);
+         tableGeometry.setMaterial(tableMaterial);
          
         // Get the coins rotation of in relation to vector and convert to degrees
         // Essentially yRot will always be @180 if tails
