@@ -168,10 +168,10 @@ You can always press escape to get back to help or get to the store where you ca
       <image filename="Interface/Images/ShopBackground.jpg" height="100%" width="100%"></image>
     </layer>
     <layer id="foreground" childLayout="vertical">
-      <panel id="panel_top" height="25%" width="75%" align="center" childLayout="center"> 
+      <panel id="panel_top" height="35%" width="75%" align="center" childLayout="center"> 
         <text text="Flip3D Shop" font="Interface/Fonts/Default.fnt" width="100%" height="100%" /> 
       </panel>
-      <panel id="panel_mid" height="40%" width="75%" align="center" childLayout="horizontal">  
+      <panel id="panel_mid" height="10%" width="75%" align="center" childLayout="horizontal">  
 	    <panel id="panel_mid_left" height="100%" width="65%" valign="center" childLayout="horizontal">
 	      <text text="LUCKY CHARM - Increases money gained from a successful bet by 20%. Cost: $1000" font="Interface/Fonts/Default.fnt" color="#0000FF" width="100%" height="100%" />
 		  <!-- +++++++++++++++++++++++ PURCHASE LUCKY CHARM BUTTON +++++++++++++++++++++++++++++++++ -->
@@ -179,7 +179,43 @@ You can always press escape to get back to help or get to the store where you ca
             <interact onClick="purchaseLuckyCharm()"/>
           </control>
         </panel>
-		<panel id="panel_mid_top_right" height="100%" width="35%" valign="center" childLayout="center">
+		<panel id="panel_mid_right" height="100%" width="35%" valign="center" childLayout="center">
+        </panel>
+      </panel>
+	  <panel id="panel_mid2" height="10%" width="75%" align="center" childLayout="horizontal">  
+	    <panel id="panel_mid_left" height="50%" width="65%" valign="center" childLayout="horizontal">
+	      <text text="POKER TABLE - Converts your table into a poker table.                           
+		  Cost: $250" font="Interface/Fonts/Default.fnt" color="#0000FF" width="100%" height="100%" />
+		  <!-- +++++++++++++++++++++++ PURCHASE POKER TABLE BUTTON +++++++++++++++++++++++++++++++++ -->
+	      <control name="button" label="Purchase" id="purchasePokerTableButton" valign="center" visibleToMouse="true">
+            <interact onClick="purchaseTableMesh(pokerBackground.jpg)"/>
+          </control>
+        </panel>
+		<panel id="panel_mid_right" height="100%" width="35%" valign="center" childLayout="center">
+        </panel>
+      </panel>
+	  <panel id="panel_mid3" height="10%" width="75%" align="center" childLayout="horizontal">  
+	    <panel id="panel_mid_left" height="50%" width="65%" valign="center" childLayout="horizontal">
+	      <text text="METAL TABLE - Converts your table into a metal table.                           
+		  Cost: $250" font="Interface/Fonts/Default.fnt" color="#0000FF" width="100%" height="100%" />
+		  <!-- +++++++++++++++++++++++ PURCHASE METAL TABLE BUTTON +++++++++++++++++++++++++++++++++ -->
+	      <control name="button" label="Purchase" id="purchaseMetalTableButton" valign="center" visibleToMouse="true">
+            <interact onClick="purchaseTableMesh(metalBackground.jpg)"/>
+          </control>
+        </panel>
+		<panel id="panel_mid_right" height="100%" width="35%" valign="center" childLayout="center">
+        </panel>
+      </panel>
+	  <panel id="panel_mid3" height="10%" width="75%" align="center" childLayout="horizontal">  
+	    <panel id="panel_mid_left" height="50%" width="65%" valign="center" childLayout="horizontal">
+	      <text text="RAINBOW COIN - Makes your coin change colors during each flip!    
+    		  Cost: $250" font="Interface/Fonts/Default.fnt" color="#0000FF" width="100%" height="100%" />
+		  <!-- +++++++++++++++++++++++ PURCHASE RAINBOW COIN BUTTON +++++++++++++++++++++++++++++++++ -->
+	      <control name="button" label="Purchase" id="purchaseRainbowCoinButton" valign="center" visibleToMouse="true">
+            <interact onClick="purchaseRainbowCoin()"/>
+          </control>
+        </panel>
+		<panel id="panel_mid_right" height="100%" width="35%" valign="center" childLayout="center">
         </panel>
       </panel>
       <panel id="panel_bottom" height="35%" width="75%" align="center" childLayout="horizontal">  
