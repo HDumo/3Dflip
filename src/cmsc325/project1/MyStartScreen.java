@@ -82,6 +82,7 @@ public class MyStartScreen extends AbstractAppState implements ScreenController 
  
     // Quit game if player clicks on Quit
     public void quitGame() {
+        app.stopAmbientAudio();
         app.stop();
     }
     
