@@ -65,6 +65,7 @@ public class CoinFlip3D extends SimpleApplication {
     public int amountOfBet;
     public double luckyCharm = 0.0;
     public String bet = "None";
+    public boolean resetCoin = false;
     
     // Audio objects declarations
     private AudioNode natureAudio;
@@ -222,6 +223,10 @@ public class CoinFlip3D extends SimpleApplication {
     
     // coin
     public void initCoin(){
+        // detach coin from scene - only if player has changed!
+        if (resetCoin) {
+            rootNode.detachChild(coin);
+        }
         // load the coin
         coin = assetManager.loadModel("Models/penny/penny.j3o");
         
@@ -240,6 +245,7 @@ public class CoinFlip3D extends SimpleApplication {
         rootNode.attachChild(coin);
         
         bulletAppState.getPhysicsSpace().add(coinPhysics);
+        resetCoin = false;
     }
     
     // Floor
