@@ -57,12 +57,18 @@ public class MyStartScreen extends AbstractAppState implements ScreenController 
     
     // Update player name when player button is clicked
     public void playerName(String nameOfPlayer) {
+        //reset all defaults
         app.displayPlayerName = nameOfPlayer;
         app.money = 1000;
         app.luckyCharm = 0.0;
         app.colorCoinState = false;
         app.imageName = "table.jpg";
         app.initTableMaterial();
+        // only reset coin if executed from pause screen
+        if (nifty.getCurrentScreen().getScreenId().equals("pause")) {
+            app.resetCoin = true;
+            app.initCoin();
+        }
     }
     
     // Resume game when player clicks on Resume
