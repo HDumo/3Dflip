@@ -126,7 +126,7 @@ public class CoinFlip3D extends SimpleApplication {
     @Override
     public void simpleInitApp(){
         //disable flycam
-        flyCam.setEnabled(false);
+        flyCam.setEnabled(true);
         //Initialize GUI
         NiftyJmeDisplay display = new NiftyJmeDisplay(assetManager, inputManager, audioRenderer, viewPort); //create jme-nifty-processor
         nifty = display.getNifty();
@@ -138,9 +138,9 @@ public class CoinFlip3D extends SimpleApplication {
     }
     
     public void LoadMainGame() {
-        flyCam.setEnabled(true);
+        
         flyCam.setMoveSpeed(10f);
-        //flyCam.setDragToRotate(true);
+        flyCam.setDragToRotate(true);
        // Setup Physics 
         bulletAppState = new BulletAppState();
         stateManager.attach(bulletAppState);
@@ -190,7 +190,7 @@ public class CoinFlip3D extends SimpleApplication {
         playerk.setJumpSpeed(20);
         playerk.setFallSpeed(30);
         playerk.setGravity(30);
-        playerk.setPhysicsLocation(new Vector3f(5, 10, 5 ));
+        playerk.setPhysicsLocation(new Vector3f(0, 4, 6 ));
 
         rootNode.attachChild(gameLevel);
         bulletAppState.getPhysicsSpace().add(landscape);
@@ -393,7 +393,7 @@ public class CoinFlip3D extends SimpleApplication {
         
         // play the ambient sound continuously
         natureAudio.play();
-        inputManager.setCursorVisible(false);   
+          
         
         //cam follows
         camDir.set(cam.getDirection()).multLocal(0.6f);
