@@ -12,7 +12,11 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AppState;
 import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
+import com.jme3.bullet.collision.shapes.CapsuleCollisionShape;
+import com.jme3.bullet.collision.shapes.CollisionShape;
+import com.jme3.bullet.control.CharacterControl;
 import com.jme3.bullet.control.RigidBodyControl;
+import com.jme3.bullet.util.CollisionShapeFactory;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.ActionListener;
@@ -27,9 +31,8 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.niftygui.NiftyJmeDisplay;
 import com.jme3.system.AppSettings;
-import com.jme3.app.state.AbstractAppState;
-import com.jme3.app.state.AppStateManager;
 import com.jme3.light.SpotLight;
+import com.jme3.scene.Node;
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.elements.render.TextRenderer;
 
@@ -70,7 +73,7 @@ public class CoinFlip3D extends SimpleApplication {
     // Audio objects declarations
     private AudioNode natureAudio;
     private AudioNode coinFlipAudio;
-        
+    
     // flipRoundState tracks where a coin is at in
     // its sacred journey to becoming a statistic.
     // null = not initialized yet
@@ -93,6 +96,14 @@ public class CoinFlip3D extends SimpleApplication {
     public boolean isRunning = false;
     public SpotLight light;
     MyStartScreen screenControl;
+    private RigidBodyControl landscape;
+    private CharacterControl playerk;
+    private Vector3f walkDirection = new Vector3f();
+    private boolean pleft = false, pright = false, pup = false, pdown = false;
+    
+      private Vector3f camDir = new Vector3f();
+  private Vector3f camLeft = new Vector3f();
+    
     
     public static void main(String[] args){
         CoinFlip3D coinFlip = new CoinFlip3D();
@@ -108,6 +119,8 @@ public class CoinFlip3D extends SimpleApplication {
         coinFlip.setDisplayStatView(isDebug);
             
         coinFlip.start();
+        
+
     }
     
     @Override
@@ -121,14 +134,13 @@ public class CoinFlip3D extends SimpleApplication {
         nifty.gotoScreen("start");
         screenControl = (MyStartScreen) nifty.getScreen("start").getScreenController();
         stateManager.attach((AppState) screenControl);
-        guiViewPort.addProcessor(display);
-        
+        guiViewPort.addProcessor(display);       
     }
     
     public void LoadMainGame() {
         flyCam.setEnabled(true);
         flyCam.setMoveSpeed(10f);
-        flyCam.setDragToRotate(true);
+        //flyCam.setDragToRotate(true);
        // Setup Physics 
         bulletAppState = new BulletAppState();
         stateManager.attach(bulletAppState);
@@ -143,18 +155,47 @@ public class CoinFlip3D extends SimpleApplication {
         cam.setLocation(new Vector3f(0, 4.0f, 6.0f));
         cam.lookAt(new Vector3f(0.0f, 1.0f, 0.0f), Vector3f.UNIT_Y);
         
+        //inputManager.setCursorVisible(false);
         // add InputManager action: spacebar flips the coin
-        inputManager.addMapping("Flip the Coin", new KeyTrigger(KeyInput.KEY_SPACE));
+        inputManager.addMapping("Flip the Coin", new KeyTrigger(KeyInput.KEY_SPACE)); // also now the jump
         inputManager.addListener(actionListener, "Flip the Coin");
         inputManager.deleteMapping(INPUT_MAPPING_EXIT);
         inputManager.addMapping("Escape", new KeyTrigger(KeyInput.KEY_ESCAPE));
         inputManager.addListener(actionListener, "Escape");
         
+        inputManager.addMapping("Left", new KeyTrigger(KeyInput.KEY_A));
+        inputManager.addMapping("Right", new KeyTrigger(KeyInput.KEY_D));
+        inputManager.addMapping("Up", new KeyTrigger(KeyInput.KEY_W));
+        inputManager.addMapping("Down", new KeyTrigger(KeyInput.KEY_S));
+        
+        inputManager.addListener(actionListener, "Left");
+        inputManager.addListener(actionListener, "Right");
+        inputManager.addListener(actionListener, "Up");
+        inputManager.addListener(actionListener, "Down");
+
         //initialize the coin flip state 
         flipState = flipRoundState.NULL;
         
         Spatial gameLevel = assetManager.loadModel("Scenes/town.j3o");
+        
+        // Make the terrain rigid    
+        CollisionShape sceneShape = CollisionShapeFactory.createMeshShape((Node) gameLevel);
+        landscape = new RigidBodyControl(sceneShape, 0);
+        gameLevel.addControl(landscape);
         gameLevel.setLocalTranslation(0, -5.2f, -10f);
+
+        // Initialize the kool player - or playerk 
+         CapsuleCollisionShape capsuleShape = new CapsuleCollisionShape(1.5f, 6f, 1);
+        playerk = new CharacterControl(capsuleShape, 0.05f);
+        playerk.setJumpSpeed(20);
+        playerk.setFallSpeed(30);
+        playerk.setGravity(30);
+        playerk.setPhysicsLocation(new Vector3f(5, 10, 5 ));
+
+        rootNode.attachChild(gameLevel);
+        bulletAppState.getPhysicsSpace().add(landscape);
+        bulletAppState.getPhysicsSpace().add(playerk);
+        
         //gameLevel.setLocalScale(2);
         rootNode.attachChild(gameLevel);
         
@@ -166,7 +207,8 @@ public class CoinFlip3D extends SimpleApplication {
         initAudio();
         initSky();
     }
-    
+
+
     //action listener
     private ActionListener actionListener = new ActionListener() {
       public void onAction(String name, boolean keyPressed, float tpf) {
@@ -176,9 +218,28 @@ public class CoinFlip3D extends SimpleApplication {
           MyStartScreen screenControl2 = (MyStartScreen) nifty.getScreen("pause").getScreenController();
           stateManager.attach((AppState) screenControl2);
         }
-        if (name.equals("Flip the Coin") && !keyPressed) {
-          flipCoin();
+        if (name.equals("Flip the Coin")) {
+          
+          if (playerk.getPhysicsLocation().distance(coin.getLocalTranslation()) < 20  ) {
+             flipCoin();
+          } else {
+              playerk.jump();
+          }
+            
         }
+        
+        if (name.equals("Left")) {
+      pleft = keyPressed;
+    } else if (name.equals("Right")) {
+      pright= keyPressed;
+    } else if (name.equals("Up")) {
+      pup = keyPressed;
+    } else if (name.equals("Down")) {
+      pdown = keyPressed;
+    } else if (name.equals("Jump")) {
+      if (keyPressed) { playerk.jump(); }
+    }
+        
       }
     };
     
@@ -329,9 +390,34 @@ public class CoinFlip3D extends SimpleApplication {
     @Override
     public void simpleUpdate(float tpf) {
        if (isRunning) {
-           // play the ambient sound continuously
-           natureAudio.play();
-           
+        
+        // play the ambient sound continuously
+        natureAudio.play();
+        inputManager.setCursorVisible(false);   
+        
+        //cam follows
+        camDir.set(cam.getDirection()).multLocal(0.6f);
+        camLeft.set(cam.getLeft()).multLocal(0.4f);
+        walkDirection.set(0, 0, 0);
+        
+        // walk when not flipping
+        if (pleft) {
+            walkDirection.addLocal(camLeft);
+        }
+        if (pright) {
+            walkDirection.addLocal(camLeft.negate());
+        }
+        if (pup) {
+            walkDirection.addLocal(camDir);
+        }
+        if (pdown) {
+            walkDirection.addLocal(camDir.negate());
+        }
+        playerk.setWalkDirection(walkDirection);
+        cam.setLocation(playerk.getPhysicsLocation());
+    
+        
+        // take care of the coin
         switch (flipState) {
             
             case BROKE:
@@ -447,8 +533,10 @@ public class CoinFlip3D extends SimpleApplication {
         float yRot = coin.getWorldRotation().toAngleAxis(new Vector3f(1, 0, 0)) * FastMath.RAD_TO_DEG;
         isHeads = (yRot < 160 || yRot > 200);
         
-        // update face in GUI
-        //nifty.getCurrentScreen().findElementByName("face").getRenderer(TextRenderer.class).setText("Heads: " + isHeads + " : " + Math.round(yRot) );
        }
+       else
+       {
+         // set cursor on screen when game is diabled  
+         inputManager.setCursorVisible(true);}
     }
 }
