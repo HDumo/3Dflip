@@ -131,8 +131,8 @@ public class MyStartScreen extends AbstractAppState implements ScreenController 
     
     // Buy rainbow coin!
     public void purchaseRainbowCoin() {
-        // if player has > $250
-        if (app.money > 250) {
+        // if player has > $250 and does not already have it.
+        if ((app.money > 250) && (!app.colorCoinState)) {
           app.money -= 250;
           app.colorCoinState = true;
         }
