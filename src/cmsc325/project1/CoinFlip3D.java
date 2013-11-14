@@ -309,7 +309,7 @@ public class CoinFlip3D extends SimpleApplication {
         resetCoin = false;
     }
     
-    // Floor
+    // Initialize the table
     public void initTable(){
         table = new Box(5.0f, 0.5f, 5.0f);
         table.scaleTextureCoordinates(new Vector2f(1, 1));
@@ -462,6 +462,11 @@ public class CoinFlip3D extends SimpleApplication {
                Boolean isHeadsState = isHeads;
                display_flipState = "watching ..." ;
                
+                // check if coin fell off table
+                if (coin.getLocalTranslation().y < 0) {
+                    flipState = flipRoundState.ERROR;
+                }
+               
                // dont move on until the side showing is stable
                if (isHeads == isHeadsState) {count ++; } else { count =0;} 
                 
@@ -515,7 +520,11 @@ public class CoinFlip3D extends SimpleApplication {
                 break;
 
             case ERROR:
-                display_flipState = "you lost your penny .. you lose!";
+                display_flipState = "You lost your coin... resetting";
+                rootNode.detachChild(coin);
+                initCoin();
+                flipState = flipRoundState.READY;
+                
             break;
 
             default:
