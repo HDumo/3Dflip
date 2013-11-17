@@ -22,6 +22,7 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.material.Material;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.math.Quaternion;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Box;
 import com.jme3.scene.Spatial;
@@ -284,7 +285,7 @@ public class CoinFlip3D extends SimpleApplication {
         // load the coin
         coin = assetManager.loadModel("Models/penny/penny.j3o");
 
-        coin.setLocalTranslation(0, 5f, 0);
+        coin.setLocalTranslation(0, 0.1f, 0);
 
         // make the coin physical with a mass > 0.0f
         coinPhysics = new RigidBodyControl(2.0f);
