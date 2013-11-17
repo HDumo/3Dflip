@@ -57,6 +57,11 @@ public class CoinFlip3D extends SimpleApplication {
     public String imageName = "table.jpg";
     private RigidBodyControl coinPhysics;
     private RigidBodyControl tablePhysics;
+    private RigidBodyControl tree1Physics;
+    private RigidBodyControl tree2Physics;
+    private RigidBodyControl tree3Physics;
+    private RigidBodyControl tree4Physics;
+    private RigidBodyControl buggyPhysics;
     Spatial coin;
     Geometry tableGeometry;
     boolean guessedCorrectly = false;
@@ -198,6 +203,8 @@ public class CoinFlip3D extends SimpleApplication {
         initTableMaterial();
         initLight();
         initTable();
+        initTrees();
+        initBuggy();
         initAudio();
         initSky();
     }
@@ -255,7 +262,7 @@ public class CoinFlip3D extends SimpleApplication {
         // blew wayyy too much time on trying to get cam.getLocation()/cam.getDirection()
         // changed to regular Vector3f - grrr - ended up just widening the Outer angle to compensate
         light = new SpotLight();
-        light.setSpotRange(8f);
+        light.setSpotRange(5f);
         light.setSpotInnerAngle(10f * FastMath.DEG_TO_RAD);
         light.setSpotOuterAngle(30f * FastMath.DEG_TO_RAD);
         light.setPosition(cam.getLocation());
@@ -333,6 +340,76 @@ public class CoinFlip3D extends SimpleApplication {
             // play sound when the coin flips
             coinFlipAudio.playInstance();
         }
+    }
+    
+    public void initTrees(){
+        
+        // setup tree 1
+        Spatial tree1 = assetManager.loadModel("Models/Tree/Tree.mesh.j3o");
+        tree1.setLocalTranslation(20, 0, 20);
+        tree1.setLocalScale(3);
+        
+        // setup tree 2
+        Spatial tree2 = assetManager.loadModel("Models/Tree/Tree.mesh.j3o");
+        tree2.setLocalTranslation(-20, 0, 20);
+        tree2.setLocalScale(3);
+        
+        // setup tree 3
+        Spatial tree3 = assetManager.loadModel("Models/Tree/Tree.mesh.j3o");
+        tree3.setLocalTranslation(20, 0, -20);
+        tree3.setLocalScale(3);
+        
+        // setup tree 4
+        Spatial tree4 = assetManager.loadModel("Models/Tree/Tree.mesh.j3o");
+        tree4.setLocalTranslation(-20, 0, -20);
+        tree4.setLocalScale(3);
+       
+        // attach them to the root node
+        rootNode.attachChild(tree1);
+        rootNode.attachChild(tree2);
+        rootNode.attachChild(tree3);
+        rootNode.attachChild(tree4);
+        
+        // tree1 physics
+        tree1Physics = new RigidBodyControl(0.0f);
+        tree1.addControl(tree1Physics);
+        bulletAppState.getPhysicsSpace().add(tree1Physics);
+        
+        // tree2 physics
+        tree2Physics = new RigidBodyControl(0.0f);
+        tree2.addControl(tree2Physics);
+        bulletAppState.getPhysicsSpace().add(tree2Physics);
+        
+        // tree3 physics
+        tree3Physics = new RigidBodyControl(0.0f);
+        tree3.addControl(tree3Physics);
+        bulletAppState.getPhysicsSpace().add(tree3Physics);
+        
+        // tree4 physics
+        tree4Physics = new RigidBodyControl(0.0f);
+        tree4.addControl(tree4Physics);
+        bulletAppState.getPhysicsSpace().add(tree4Physics);
+    }
+    
+    public void initBuggy(){
+        
+        // load vehicle mesh
+        Spatial buggy = assetManager.loadModel("Models/Buggy/Buggy.j3o");
+        
+        // position the vehicle mesh in the scene
+        buggy.setLocalTranslation(0,1,-15);
+        buggy.setLocalScale(2);
+        Quaternion rotate45 = new Quaternion();
+        rotate45.fromAngleAxis(45*FastMath.DEG_TO_RAD, Vector3f.UNIT_Y);
+        buggy.setLocalRotation(rotate45);
+        
+        // attach it to the root node
+        rootNode.attachChild(buggy);
+        
+        // vehicle physics
+        buggyPhysics = new RigidBodyControl(0.0f);
+        buggy.addControl(buggyPhysics);
+        bulletAppState.getPhysicsSpace().add(buggyPhysics);
     }
 
     public void initAudio() {
