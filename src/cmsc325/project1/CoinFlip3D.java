@@ -256,7 +256,7 @@ public class CoinFlip3D extends SimpleApplication {
         light = new SpotLight();
         light.setSpotRange(8f);
         light.setSpotInnerAngle(10f * FastMath.DEG_TO_RAD);
-        light.setSpotOuterAngle(50f * FastMath.DEG_TO_RAD);
+        light.setSpotOuterAngle(30f * FastMath.DEG_TO_RAD);
         light.setPosition(cam.getLocation());
         light.setDirection(cam.getDirection());
 
